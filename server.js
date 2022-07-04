@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 const bcrypt = require("bcrypt");
 
 const File = require('./models/file');
+const file = require('./models/file');
 
 app.set("view engine", "ejs");
 
@@ -40,6 +41,10 @@ app.post('/upload', upload.single("file"), async (req, res)=>{
 })
 app.get('/file/:id', (req, res)=> {
     res.render("index", {fileLink: `${req.headers.origin}/file/${file.id}`})
+    const file = await File.findById(req.params.id);
+    file.downloadCount++;
+    await file.save;
+    res.download(file.path, file.originalName);
 })
 app.listen(PORT, (req, res)=> {
     console.log(`Server started on port no. ${PORT}`);
